@@ -9,8 +9,8 @@ const router = express.Router();
 
 router.use(auth);
 
-// Todas las rutas requieren acceso al equipo
-router.post('/:equipoId/tareas', 
+// Cambiar las rutas - eliminar /tareas del patrón
+router.post('/:equipoId', 
   validaciones.validarUUID('equipoId'),
   validaciones.crearTarea,
   manejarValidacion,
@@ -18,7 +18,7 @@ router.post('/:equipoId/tareas',
   TareaController.crear
 );
 
-router.get('/:equipoId/tareas', 
+router.get('/:equipoId', 
   validaciones.validarUUID('equipoId'),
   validaciones.validarQueryTareas,
   manejarValidacion,
@@ -26,7 +26,7 @@ router.get('/:equipoId/tareas',
   TareaController.listar
 );
 
-router.get('/:equipoId/tareas/:tareaId', 
+router.get('/:equipoId/:tareaId', 
   validaciones.validarUUID('equipoId'),
   validaciones.validarUUID('tareaId'),
   manejarValidacion,
@@ -34,7 +34,7 @@ router.get('/:equipoId/tareas/:tareaId',
   TareaController.obtener
 );
 
-router.put('/:equipoId/tareas/:tareaId', 
+router.put('/:equipoId/:tareaId', 
   validaciones.validarUUID('equipoId'),
   validaciones.validarUUID('tareaId'),
   validaciones.actualizarTarea,
@@ -43,7 +43,7 @@ router.put('/:equipoId/tareas/:tareaId',
   TareaController.actualizar
 );
 
-router.delete('/:equipoId/tareas/:tareaId', 
+router.delete('/:equipoId/:tareaId', 
   validaciones.validarUUID('equipoId'),
   validaciones.validarUUID('tareaId'),
   manejarValidacion,
@@ -51,7 +51,7 @@ router.delete('/:equipoId/tareas/:tareaId',
   TareaController.eliminar
 );
 
-router.post('/:equipoId/tareas/:tareaId/comentarios', 
+router.post('/:equipoId/:tareaId/comentarios', 
   validaciones.validarUUID('equipoId'),
   validaciones.validarUUID('tareaId'),
   validaciones.crearComentario,
