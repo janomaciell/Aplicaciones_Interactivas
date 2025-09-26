@@ -36,7 +36,6 @@ router.delete('/etiquetas/:etiquetaId',
   manejarValidacion,EtiquetaController.eliminar
 );
 
-// Asociaciones tarea-etiqueta
 router.post('/etiquetas/:etiquetaId/tareas/:tareaId', 
   validaciones.validarUUID('etiquetaId'),
   validaciones.validarUUID('tareaId'),

@@ -9,7 +9,6 @@ const router = express.Router();
 
 router.use(auth);
 
-// Cambiar las rutas - eliminar /tareas del patrón
 router.post('/:equipoId', 
   validaciones.validarUUID('equipoId'),
   validaciones.crearTarea,

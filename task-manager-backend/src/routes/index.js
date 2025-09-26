@@ -7,14 +7,12 @@ const actividadRoutes = require('./actividad');
 
 const router = express.Router();
 
-// Rutas de la API
 router.use('/auth', authRoutes);
 router.use('/equipos', equipoRoutes);
 router.use('/tareas', tareaRoutes);
 router.use('/etiquetas', etiquetaRoutes);
 router.use('/actividad', actividadRoutes);
 
-// Ruta de health check
 router.get('/health', (req, res) => {
   res.status(200).json({
     success: true,
@@ -23,7 +21,6 @@ router.get('/health', (req, res) => {
   });
 });
 
-// Ruta base de API
 router.get('/', (req, res) => {
   res.status(200).json({
     success: true,

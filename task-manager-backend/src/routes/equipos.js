@@ -7,7 +7,6 @@ const { verificarAccesoEquipo, verificarAdminEquipo } = require('../middleware/e
 
 const router = express.Router();
 
-// Rutas públicas
 router.use(auth);
 
 router.post('/', 
@@ -18,7 +17,6 @@ router.post('/',
 
 router.get('/', EquipoController.listar);
 
-// Rutas privadas (con acceso al equipo)
 router.get('/:equipoId', 
   validaciones.validarUUID('equipoId'),
   manejarValidacion,
@@ -43,7 +41,6 @@ router.delete('/:equipoId',
   EquipoController.eliminar
 );
 
-// Gestión de miembros (solo admins)
 router.post('/:equipoId/miembros', 
   validaciones.validarUUID('equipoId'),
   manejarValidacion,
