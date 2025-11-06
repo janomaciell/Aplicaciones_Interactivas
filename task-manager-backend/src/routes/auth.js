@@ -23,4 +23,9 @@ router.get('/perfil',
   AuthController.perfil
 );
 
+router.get('/usuarios', 
+  auth,
+  AuthController.listarUsuarios
+);
+
 module.exports = router;

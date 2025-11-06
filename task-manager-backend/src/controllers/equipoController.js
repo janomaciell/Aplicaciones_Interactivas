@@ -302,6 +302,34 @@ class EquipoController {
       });
     }
   }
+
+  static async listarMiembros(req, res) {
+    try {
+      const { equipoId } = req.params;
+
+      const membresias = await Membresia.findAll({
+        where: { equipoId, activo: true },
+        include: [
+          {
+            model: Usuario,
+            as: 'usuario',
+            attributes: ['id', 'nombre', 'email', 'avatar']
+          }
+        ],
+        order: [['createdAt', 'ASC']]
+      });
+
+      res.json({
+        success: true,
+        data: { miembros: membresias }
+      });
+    } catch (error) {
+      res.status(500).json({
+        success: false,
+        message: 'Error al listar miembros'
+      });
+    }
+  }
 }
 
 module.exports = EquipoController;

@@ -101,6 +101,26 @@ class AuthController {
       });
     }
   }
+
+  static async listarUsuarios(req, res) {
+    try {
+      const usuarios = await Usuario.findAll({
+        where: { activo: true },
+        attributes: ['id', 'nombre', 'email', 'avatar'],
+        order: [['nombre', 'ASC']]
+      });
+
+      res.json({
+        success: true,
+        data: { usuarios }
+      });
+    } catch (error) {
+      res.status(500).json({
+        success: false,
+        message: 'Error al listar usuarios'
+      });
+    }
+  }
 }
 
 module.exports = AuthController;

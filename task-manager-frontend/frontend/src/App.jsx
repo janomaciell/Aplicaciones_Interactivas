@@ -1,34 +1,39 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
+import { Routes, Route, Navigate } from 'react-router-dom'
+import { Layout } from './components/Layout.jsx'
+import { ProtectedRoute } from './components/ProtectedRoute.jsx'
+import Login from './pages/Login.jsx'
+import Register from './pages/Register.jsx'
+import Dashboard from './pages/Dashboard.jsx'
+import TaskBoard from './pages/TaskBoard.jsx'
+import TaskList from './pages/TaskList.jsx'
+import TaskForm from './pages/TaskForm.jsx'
+import TaskDetails from './pages/TaskDetails.jsx'
+import Teams from './pages/Teams.jsx'
+import Labels from './pages/Labels.jsx'
+import Activities from './pages/Activities.jsx'
+import NotFound from './pages/NotFound.jsx'
 import './App.css'
 
 function App() {
-  const [count, setCount] = useState(0)
-
   return (
-    <>
-      <div>
-        <a href="https://vite.dev" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
-      </div>
-      <h1>Vite + React</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/App.jsx</code> and save to test HMR
-        </p>
-      </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
-    </>
+    <Routes>
+      <Route path="/login" element={<Login />} />
+      <Route path="/register" element={<Register />} />
+
+      <Route element={<ProtectedRoute><Layout /></ProtectedRoute>}>
+        <Route index element={<Navigate to="/dashboard" replace />} />
+        <Route path="/dashboard" element={<Dashboard />} />
+        <Route path="/board" element={<TaskBoard />} />
+        <Route path="/tareas" element={<TaskList />} />
+        <Route path="/tareas/nueva" element={<TaskForm />} />
+        <Route path="/tareas/:id" element={<TaskForm />} />
+        <Route path="/equipos" element={<Teams />} />
+        <Route path="/etiquetas" element={<Labels />} />
+        <Route path="/actividades" element={<Activities />} />
+      </Route>
+
+      <Route path="*" element={<NotFound />} />
+    </Routes>
   )
 }
 

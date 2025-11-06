@@ -11,8 +11,10 @@ const errorHandler = require('./middleware/errorHandler');
 const app = express();
 
 const limiter = rateLimit({
-  windowMs: 15 * 60 * 1000, // 15 minutos
-  max: 100, 
+  windowMs: 15 * 60 * 1000,
+  max: parseInt(process.env.RATE_LIMIT_MAX || (process.env.NODE_ENV === 'development' ? 1000 : 100)),
+  standardHeaders: true,
+  legacyHeaders: false,
   message: {
     success: false,
     message: 'Demasiadas solicitudes desde esta IP'
@@ -21,7 +23,10 @@ const limiter = rateLimit({
 
 app.use(helmet());
 app.use(cors({
-  origin: process.env.FRONTEND_URL || 'http://localhost:3000',
+  origin: [
+    process.env.FRONTEND_URL || 'http://localhost:5173',
+    'http://localhost:3000'
+  ],
   credentials: true
 }));
 app.use(limiter);

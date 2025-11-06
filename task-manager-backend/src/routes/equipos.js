@@ -17,28 +17,12 @@ router.post('/',
 
 router.get('/', EquipoController.listar);
 
-router.get('/:equipoId', 
+// Rutas de miembros deben ir antes de las rutas generales de equipo
+router.get('/:equipoId/miembros', 
   validaciones.validarUUID('equipoId'),
   manejarValidacion,
   verificarAccesoEquipo,
-  EquipoController.obtener
-);
-
-router.put('/:equipoId', 
-  validaciones.validarUUID('equipoId'),
-  validaciones.crearEquipo,
-  manejarValidacion,
-  verificarAccesoEquipo,
-  verificarAdminEquipo,
-  EquipoController.actualizar
-);
-
-router.delete('/:equipoId', 
-  validaciones.validarUUID('equipoId'),
-  manejarValidacion,
-  verificarAccesoEquipo,
-  verificarAdminEquipo,
-  EquipoController.eliminar
+  EquipoController.listarMiembros
 );
 
 router.post('/:equipoId/miembros', 
@@ -65,6 +49,30 @@ router.put('/:equipoId/miembros/:usuarioId/rol',
   verificarAccesoEquipo,
   verificarAdminEquipo,
   EquipoController.actualizarRol
+);
+
+router.get('/:equipoId', 
+  validaciones.validarUUID('equipoId'),
+  manejarValidacion,
+  verificarAccesoEquipo,
+  EquipoController.obtener
+);
+
+router.put('/:equipoId', 
+  validaciones.validarUUID('equipoId'),
+  validaciones.crearEquipo,
+  manejarValidacion,
+  verificarAccesoEquipo,
+  verificarAdminEquipo,
+  EquipoController.actualizar
+);
+
+router.delete('/:equipoId', 
+  validaciones.validarUUID('equipoId'),
+  manejarValidacion,
+  verificarAccesoEquipo,
+  verificarAdminEquipo,
+  EquipoController.eliminar
 );
 
 module.exports = router;
