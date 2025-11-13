@@ -30,7 +30,7 @@ export default function TaskForm() {
   const esEdicion = !!id
 
   const [equipos, setEquipos] = useState([])
-  const [usuarios, setUsuarios] = useState([])
+  const [miembros, setMiembros] = useState([])
   const [etiquetasDisponibles, setEtiquetasDisponibles] = useState([])
   
   const [equipoId, setEquipoId] = useState('')
@@ -51,22 +51,14 @@ export default function TaskForm() {
   const [loading, setLoading] = useState(false)
   const [cargando, setCargando] = useState(esEdicion)
 
+  // Cargar equipos al inicio
   useEffect(() => {
     ;(async () => {
       try {
-        const [resEquipos, resUsuarios] = await Promise.all([
-          api.get('/equipos'),
-          api.get('/auth/usuarios')
-        ])
-        
+        const resEquipos = await api.get('/equipos')
         const equiposData = resEquipos?.data?.data?.equipos || []
-        const usuariosData = resUsuarios?.data?.data?.usuarios || []
-        
-        console.log('Equipos cargados jano:', equiposData)
-        console.log('Usuarios cargados jano:', usuariosData)
         
         setEquipos(equiposData)
-        setUsuarios(usuariosData)
         
         const equipoParam = searchParams.get('equipo')
         if (equipoParam) {
@@ -76,9 +68,8 @@ export default function TaskForm() {
           setEquipoId(primerEquipo.id)
         }
       } catch (e) {
-        console.error('Error cargando datos:', e)
-        console.error('Detalles del error:', e.response?.data || e.message)
-        error('Error', 'No se pudieron cargar los datos. Verifica la consola para más detalles.')
+        console.error('Error cargando equipos:', e)
+        error('Error', 'No se pudieron cargar los equipos')
       }
     })()
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -95,13 +86,31 @@ export default function TaskForm() {
     }
   }, [id, equipoId, equipos.length])
 
+  // Cargar miembros y etiquetas cuando cambia el equipo
   useEffect(() => {
     if (equipoId) {
+      cargarMiembros(equipoId)
       cargarEtiquetas(equipoId)
     } else {
+      setMiembros([])
       setEtiquetasDisponibles([])
     }
   }, [equipoId])
+
+  const cargarMiembros = async (equipoId) => {
+    if (!equipoId) {
+      setMiembros([])
+      return
+    }
+    try {
+      const res = await api.get(`/equipos/${equipoId}/miembros`)
+      const miembrosData = res?.data?.data?.miembros || []
+      setMiembros(miembrosData)
+    } catch (e) {
+      console.error('Error cargando miembros:', e)
+      setMiembros([])
+    }
+  }
 
   const cargarEtiquetas = async (equipoId) => {
     if (!equipoId) {
@@ -396,14 +405,21 @@ export default function TaskForm() {
                     className="field-input"
                     value={asignadoA}
                     onChange={(e) => setAsignadoA(e.target.value)}
+                    disabled={!equipoId}
                   >
                     <option value="">Sin asignar</option>
-                    {usuarios.map((u) => (
-                      <option key={u.id} value={u.id}>
-                        {u.nombre} ({u.email})
-                      </option>
-                    ))}
+                    {miembros.map((membresia) => {
+                      const usuario = membresia.usuario || membresia
+                      return (
+                        <option key={usuario.id} value={usuario.id}>
+                          @{usuario.nombre || usuario.email}
+                        </option>
+                      )
+                    })}
                   </select>
+                  {!equipoId && (
+                    <div className="field-hint">Seleccioná un equipo primero</div>
+                  )}
                 </label>
               </div>
             </div>
@@ -412,13 +428,14 @@ export default function TaskForm() {
               <label className="field">
                 <div className="field-label">Equipo</div>
                 <select
-                  className="field-input"
+                  className={`field-input${errors.equipoId ? ' has-error' : ''}`}
                   value={equipoId}
                   onChange={(e) => {
-                    setEquipoId(e.target.value)
+                    const nuevoEquipoId = e.target.value
+                    setEquipoId(nuevoEquipoId)
+                    setAsignadoA('') // Limpiar asignación al cambiar equipo
                     if (errors.equipoId) setErrors({ ...errors, equipoId: '' })
                   }}
-                  error={errors.equipoId}
                   required
                   disabled={esEdicion}
                 >
@@ -427,6 +444,10 @@ export default function TaskForm() {
                     <option key={eq.id} value={eq.id}>{eq.nombre}</option>
                   ))}
                 </select>
+                {errors.equipoId && <div className="field-error">{errors.equipoId}</div>}
+                {equipos.length === 0 && (
+                  <div className="field-hint">No tenés equipos. Creá uno desde la sección Equipos.</div>
+                )}
               </label>
             </div>
 

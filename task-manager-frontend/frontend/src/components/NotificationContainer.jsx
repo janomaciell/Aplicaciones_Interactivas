@@ -17,8 +17,8 @@ export default function NotificationContainer() {
           <div className="notification-icon">
             {notification.type === 'success' && '✓'}
             {notification.type === 'error' && '✕'}
-            {notification.type === 'warning' && '⚠'}
-            {notification.type === 'info' && 'ℹ'}
+            {notification.type === 'warning' && '!'}
+            {notification.type === 'info' && 'i'}
           </div>
           <div className="notification-content">
             <div className="notification-title">{notification.title}</div>

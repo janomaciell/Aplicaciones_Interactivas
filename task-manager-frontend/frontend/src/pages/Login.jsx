@@ -86,13 +86,13 @@ export default function Login() {
                 onClick={() => setShowPassword(!showPassword)}
                 aria-label={showPassword ? 'Ocultar contraseña' : 'Mostrar contraseña'}
               >
-                {showPassword ? '👁️' : '👁️‍🗨️'}
+                {showPassword ? 'Ocultar' : 'Mostrar'}
               </button>
             </div>
             {errors.password && <div className="field-error">{errors.password}</div>}
           </div>
           {errors.general && <div className="field-error" style={{ marginTop: 8 }}>{errors.general}</div>}
-          <Button type="submit" disabled={loading} style={{ width: '100%', marginTop: 8 }}>
+          <Button type="submit" disabled={loading} className="btn-full-width">
             {loading ? 'Ingresando...' : 'Ingresar'}
           </Button>
         </form>
