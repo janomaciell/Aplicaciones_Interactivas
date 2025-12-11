@@ -80,23 +80,45 @@ export default function TaskBoard() {
   const animarBoard = () => {
     const columns = boardRef.current?.querySelectorAll('.column')
     if (columns) {
+      // Asegurar que todas las columnas tengan opacidad 1 inicialmente
+      columns.forEach(column => {
+        gsap.set(column, { opacity: 1 })
+      })
+      
       gsap.from(columns, {
         duration: 0.6,
         y: 30,
         opacity: 0,
         stagger: 0.1,
-        ease: 'power2.out'
+        ease: 'power2.out',
+        onComplete: () => {
+          // Asegurar que todas las columnas tengan opacidad 1 al finalizar
+          columns.forEach(column => {
+            gsap.set(column, { opacity: 1 })
+          })
+        }
       })
     }
 
     const cards = boardRef.current?.querySelectorAll('.kanban-card')
     if (cards) {
+      // Asegurar que todas las tarjetas tengan opacidad 1 inicialmente
+      cards.forEach(card => {
+        gsap.set(card, { opacity: 1 })
+      })
+      
       gsap.from(cards, {
         duration: 0.4,
         scale: 0.9,
         opacity: 0,
         stagger: 0.05,
-        ease: 'back.out(1.2)'
+        ease: 'back.out(1.2)',
+        onComplete: () => {
+          // Asegurar que todas las tarjetas tengan opacidad 1 al finalizar
+          cards.forEach(card => {
+            gsap.set(card, { opacity: 1, scale: 1 })
+          })
+        }
       })
     }
   }
@@ -163,7 +185,7 @@ export default function TaskBoard() {
       })
     } catch (e) {
       setTareas(prev)
-      if (e.response?.status === 400) {
+      if (e.response?.status === 400 || e.response?.status === 422) {
         const message = e.response?.data?.message || 'No se puede cambiar el estado de la tarea'
         const tareasPendientes = e.response?.data?.data?.tareasPendientes || []
         if (tareasPendientes.length > 0) {
@@ -284,7 +306,7 @@ export default function TaskBoard() {
                                 cursor: 'help'
                               }}
                             >
-                              🔒
+                              ⛔
                             </span>
                           )}
                           {t._dependenciesResumen?.tieneDuplicados && (
@@ -296,7 +318,7 @@ export default function TaskBoard() {
                                 cursor: 'help'
                               }}
                             >
-                              🔄
+                              🔁
                             </span>
                           )}
                         </div>

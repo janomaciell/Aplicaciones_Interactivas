@@ -281,6 +281,65 @@ body {
     box-shadow: 0 0 0 3px #fee2e2;
   }
   
+  /* Estilos para opciones de select - asegurar opacidad completa */
+  select.field-input,
+  select.field-input option {
+    opacity: 1 !important;
+    -webkit-opacity: 1 !important;
+    -moz-opacity: 1 !important;
+  }
+  
+  .field-input option {
+    opacity: 1 !important;
+    background-color: #ffffff !important;
+    background: #ffffff !important;
+    color: #1a202c !important;
+    padding: 8px 12px;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    appearance: none;
+  }
+  
+  /* Asegurar que el select mismo no tenga opacidad reducida */
+  select.field-input {
+    opacity: 1 !important;
+    background-color: #ffffff !important;
+    background: #ffffff !important;
+    color: #1a202c !important;
+  }
+  
+  /* Estilos específicos para cuando el select está abierto */
+  select.field-input:focus option,
+  select.field-input option:checked,
+  select.field-input option:hover {
+    opacity: 1 !important;
+    background-color: #ffffff !important;
+    background: #ffffff !important;
+    color: #1a202c !important;
+  }
+  
+  .field-input:disabled {
+    opacity: 0.7;
+    cursor: not-allowed;
+    background-color: var(--bg-tertiary);
+  }
+  
+  .field-input:disabled option {
+    opacity: 1 !important;
+    background-color: #ffffff !important;
+    background: #ffffff !important;
+    color: #1a202c !important;
+  }
+  
+  /* Regla adicional para todos los selects en modales */
+  .modal select.field-input option,
+  [role="dialog"] select.field-input option {
+    opacity: 1 !important;
+    background-color: #ffffff !important;
+    background: #ffffff !important;
+    color: #1a202c !important;
+  }
+  
   .field-hint {
     margin-top: 6px;
     color: var(--text-muted);
@@ -812,6 +871,14 @@ body {
   /* ===================================
      BADGES - Sistema Semáforo
      =================================== */
+  /* Asegurar que todos los elementos dentro de las filas de la tabla tengan opacidad completa */
+  .tasks-table tbody tr,
+  .tasks-table tbody tr *,
+  .tasks-table .badge,
+  .tasks-table .badge * {
+    opacity: 1 !important;
+  }
+  
   .badge {
     display: inline-flex;
     align-items: center;
@@ -1168,20 +1235,32 @@ body {
   .tasks-table tbody tr {
     border-bottom: 1px solid var(--border-light);
     transition: all 0.2s ease;
+    opacity: 1 !important;
+    background-color: #ffffff !important;
   }
   
   .tasks-table tbody tr:hover {
-    background: var(--bg-tertiary);
+    background: var(--bg-tertiary) !important;
+    opacity: 1 !important;
   }
   
   .tasks-table tbody tr:last-child {
     border-bottom: none;
+    opacity: 1 !important;
   }
   
   .tasks-table td {
     padding: 16px;
     vertical-align: middle;
-    color: var(--text-primary);
+    color: var(--text-primary) !important;
+    opacity: 1 !important;
+    background-color: transparent !important;
+  }
+  
+  /* Asegurar que el texto dentro de las celdas no tenga transparencia */
+  .tasks-table td * {
+    opacity: 1 !important;
+    color: inherit !important;
   }
   
   .task-title {
@@ -1190,10 +1269,21 @@ body {
     display: flex;
     align-items: center;
     gap: 8px;
+    opacity: 1 !important;
+    color: var(--text-primary) !important;
+  }
+  
+  .task-title span {
+    opacity: 1 !important;
+    color: inherit !important;
   }
   
   .task-title:hover {
-    color: var(--primary);
+    color: var(--primary) !important;
+  }
+  
+  .task-title:hover span {
+    color: var(--primary) !important;
   }
   
   /* ===================================
@@ -1716,6 +1806,29 @@ body {
   margin-bottom: 16px;
 }
 
+/* Estilos específicos para selects dentro de modales - sin transparencia */
+.modal select,
+.modal select option,
+.modal .field-input,
+.modal .field-input option {
+  opacity: 1 !important;
+  background-color: #ffffff !important;
+  background: #ffffff !important;
+  color: #1a202c !important;
+}
+
+.modal select option:hover,
+.modal select option:focus,
+.modal select option:active,
+.modal .field-input option:hover,
+.modal .field-input option:focus,
+.modal .field-input option:active {
+  opacity: 1 !important;
+  background-color: #f5f6f8 !important;
+  background: #f5f6f8 !important;
+  color: #1a202c !important;
+}
+
 .modal-actions {
   display: flex;
   justify-content: flex-end;
@@ -1762,7 +1875,11 @@ body {
     border-radius: 12px;
     padding: 16px;
     border: 1px solid var(--panel-border);
-    opacity: 1;
+    opacity: 1 !important;
+  }
+  
+  .column * {
+    opacity: 1 !important;
   }
   
   .column-head {
@@ -1805,11 +1922,29 @@ body {
     cursor: pointer;
     transition: all 0.2s ease;
     box-shadow: var(--panel-shadow);
+    opacity: 1 !important;
+  }
+  
+  /* Asegurar que todos los elementos dentro de las tarjetas tengan opacidad completa */
+  .kanban-card,
+  .kanban-card * {
+    opacity: 1 !important;
   }
   
   .kanban-card:hover {
     box-shadow: var(--panel-shadow-hover);
     transform: translateY(-2px);
+    opacity: 1 !important;
+  }
+  
+  .kanban-card:hover * {
+    opacity: 1 !important;
+  }
+  
+  /* Asegurar que el texto dentro de las tarjetas tenga color completo */
+  .kanban-card span,
+  .kanban-card div {
+    color: inherit !important;
   }
   
   @media (max-width: 1024px) {

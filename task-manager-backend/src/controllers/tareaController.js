@@ -208,7 +208,7 @@ class TareaController {
         const validacion = await TareaDependencyService.validarCierreTarea(tareaId);
         
         if (!validacion.puedeCerrar) {
-          return res.status(400).json({
+          return res.status(422).json({
             success: false,
             message: 'No se puede finalizar la tarea porque tiene dependencias pendientes',
             data: {

@@ -146,12 +146,21 @@ export default function TaskList() {
     // Animar filas de la tabla
     const rows = tableRef.current?.querySelectorAll('tbody tr')
     if (rows) {
+      rows.forEach(row => {
+        gsap.set(row, { opacity: 1 })
+      })
+      
       gsap.from(rows, {
         duration: 0.4,
         y: 20,
         opacity: 0,
         stagger: 0.05,
-        ease: 'power2.out'
+        ease: 'power2.out',
+        onComplete: () => {
+          rows.forEach(row => {
+            gsap.set(row, { opacity: 1 })
+          })
+        }
       })
     }
   }
@@ -405,7 +414,7 @@ export default function TaskList() {
                                   lineHeight: 1
                                 }}
                               >
-                                🔒
+                                ⛔
                               </span>
                             )}
                             {tarea._dependenciesResumen?.tieneDuplicados && (
@@ -418,7 +427,7 @@ export default function TaskList() {
                                   lineHeight: 1
                                 }}
                               >
-                                🔄
+                                🔁
                               </span>
                             )}
                           </div>

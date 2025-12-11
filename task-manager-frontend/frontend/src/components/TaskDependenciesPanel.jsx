@@ -51,8 +51,17 @@ export default function TaskDependenciesPanel({ tarea, equipoId, canEdit = true,
       ])
       
       const deps = depsRes.data?.data?.dependencias || []
-      const tasks = tasksRes.data?.data?.tareas || tasksRes.data?.data?.rows || []
+      const tasksRaw = tasksRes.data?.data?.tareas || tasksRes.data?.data?.rows || []
+      const tasks = tasksRaw.filter((task, index, self) => 
+        index === self.findIndex(t => String(t.id) === String(task.id))
+      )
       const resumenData = resumenRes.data?.data?.resumen || null
+
+      console.log('Tareas cargadas en TaskDependenciesPanel:', {
+        raw: tasksRaw.length,
+        unicas: tasks.length,
+        tareas: tasks.map(t => ({ id: t.id, titulo: t.titulo, estado: t.estado }))
+      })
 
       setDependencias(deps)
       setAvailableTasks(tasks)
@@ -90,13 +99,57 @@ export default function TaskDependenciesPanel({ tarea, equipoId, canEdit = true,
     }
   }
   
-  const handleAdd = (type) => {
+  const handleAdd = async (type) => {
+    // Recargar las tareas disponibles antes de abrir el modal
+    if (equipoId) {
+      try {
+        const tasksRes = await api.get(`/tareas/${equipoId}`).catch(err => {
+          console.error('Error cargando tareas:', err)
+          return { data: { data: { tareas: [] } } }
+        })
+        const tasksRaw = tasksRes.data?.data?.tareas || tasksRes.data?.data?.rows || []
+        // Eliminar duplicados basándose en el ID
+        const tasks = tasksRaw.filter((task, index, self) => 
+          index === self.findIndex(t => String(t.id) === String(task.id))
+        )
+        console.log('Tareas recargadas en handleAdd:', {
+          raw: tasksRaw.length,
+          unicas: tasks.length,
+          tareas: tasks.map(t => ({ id: t.id, titulo: t.titulo }))
+        })
+        setAvailableTasks(tasks)
+      } catch (err) {
+        console.error('Error recargando tareas:', err)
+      }
+    }
     setFormType(type)
     setEditingDependency(null)
     setFormOpen(true)
   }
   
-  const handleEdit = (dependency) => {
+  const handleEdit = async (dependency) => {
+    // Recargar las tareas disponibles antes de abrir el modal
+    if (equipoId) {
+      try {
+        const tasksRes = await api.get(`/tareas/${equipoId}`).catch(err => {
+          console.error('Error cargando tareas:', err)
+          return { data: { data: { tareas: [] } } }
+        })
+        const tasksRaw = tasksRes.data?.data?.tareas || tasksRes.data?.data?.rows || []
+        // Eliminar duplicados basándose en el ID
+        const tasks = tasksRaw.filter((task, index, self) => 
+          index === self.findIndex(t => String(t.id) === String(task.id))
+        )
+        console.log('Tareas recargadas en handleEdit:', {
+          raw: tasksRaw.length,
+          unicas: tasks.length,
+          tareas: tasks.map(t => ({ id: t.id, titulo: t.titulo }))
+        })
+        setAvailableTasks(tasks)
+      } catch (err) {
+        console.error('Error recargando tareas:', err)
+      }
+    }
     setEditingDependency(dependency)
     setFormType(dependency.type)
     setFormOpen(true)
@@ -159,7 +212,29 @@ export default function TaskDependenciesPanel({ tarea, equipoId, canEdit = true,
 
   const missingIds = !tareaId || !equipoId
   
-  const abrirNuevaDependencia = () => {
+  const abrirNuevaDependencia = async () => {
+    // Recargar las tareas disponibles antes de abrir el modal
+    if (equipoId) {
+      try {
+        const tasksRes = await api.get(`/tareas/${equipoId}`).catch(err => {
+          console.error('Error cargando tareas:', err)
+          return { data: { data: { tareas: [] } } }
+        })
+        const tasksRaw = tasksRes.data?.data?.tareas || tasksRes.data?.data?.rows || []
+        // Eliminar duplicados basándose en el ID
+        const tasks = tasksRaw.filter((task, index, self) => 
+          index === self.findIndex(t => String(t.id) === String(task.id))
+        )
+        console.log('Tareas recargadas en abrirNuevaDependencia:', {
+          raw: tasksRaw.length,
+          unicas: tasks.length,
+          tareas: tasks.map(t => ({ id: t.id, titulo: t.titulo }))
+        })
+        setAvailableTasks(tasks)
+      } catch (err) {
+        console.error('Error recargando tareas:', err)
+      }
+    }
     setFormType('DEPENDS_ON')
     setEditingDependency(null)
     setFormOpen(true)
