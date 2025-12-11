@@ -59,19 +59,16 @@ export default function Teams() {
     if (teamsListRef.current) {
       const items = teamsListRef.current.querySelectorAll('.team-item')
       
-      // Primero, asegurar que TODOS los elementos sean visibles inmediatamente
       items.forEach((item) => {
         gsap.set(item, { 
           opacity: 1, 
           x: 0,
           clearProps: 'all'
         })
-        // Forzar visibilidad también con CSS
         item.style.opacity = '1'
         item.style.transform = 'translateX(0)'
       })
       
-      // Luego aplicar animaciones suaves
       gsap.fromTo(items, 
         {
           opacity: 0.3,
@@ -88,7 +85,6 @@ export default function Teams() {
     }
 
     if (detailRef.current) {
-      // Asegurar visibilidad del detalle
       gsap.set(detailRef.current, { 
         opacity: 1, 
         x: 0,
@@ -97,7 +93,6 @@ export default function Teams() {
       detailRef.current.style.opacity = '1'
       detailRef.current.style.transform = 'translateX(0)'
       
-      // Luego animar
       gsap.fromTo(detailRef.current,
         {
           opacity: 0.3,

@@ -22,10 +22,10 @@ const db = {
   HistorialEstado: require('./historialEstado')(sequelize, Sequelize),
   Etiqueta: require('./etiqueta')(sequelize, Sequelize),
   TareaEtiqueta: require('./tareaEtiqueta')(sequelize, Sequelize),
-  Actividad: require('./actividad')(sequelize, Sequelize)
+  Actividad: require('./actividad')(sequelize, Sequelize),
+  TareaDependency: require('./tareaDependency')(sequelize, Sequelize)
 };
 
-// Definir asociaciones
 Object.keys(db).forEach(modelName => {
   if (db[modelName].associate) {
     db[modelName].associate(db);

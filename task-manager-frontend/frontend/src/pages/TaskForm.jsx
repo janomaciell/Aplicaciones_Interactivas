@@ -7,6 +7,7 @@ import Button from '../components/Button.jsx'
 import Input from '../components/Input.jsx'
 import Card from '../components/Card.jsx'
 import Modal from '../components/Modal.jsx'
+import TaskDependenciesPanel from '../components/TaskDependenciesPanel.jsx'
 
 const ESTADOS = [
   { value: 'pendiente', label: 'Pendiente', color: '#fef3c7', textColor: '#92400e' },
@@ -512,85 +513,94 @@ export default function TaskForm() {
           </div>
         </Card>
 
-        {esEdicion && (
-          <>
-            <Card title="Comentarios">
-              <div className="comentarios-section">
-                <div className="comentario-input">
-                  <textarea
-                    className="field-input"
-                    value={nuevoComentario}
-                    onChange={(e) => setNuevoComentario(e.target.value)}
-                    placeholder="Escribe un comentario..."
-                    rows={3}
-                  />
-                  <Button type="button" onClick={agregarComentario} disabled={!nuevoComentario.trim()}>
-                    Enviar
-                  </Button>
-                </div>
-                <div className="comentarios-list">
-                  {comentarios.map((c) => (
-                    <div key={c.id} className="comentario-item">
-                      <div className="comentario-header">
-                        <strong>@{c.usuario?.nombre || c.autor?.nombre || c.usuario?.email || c.autor?.email || 'Usuario'}</strong>
-                        <span className="comentario-fecha">{formatearFecha(c.createdAt)}</span>
-                      </div>
-                      <div className="comentario-contenido">{c.contenido}</div>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            </Card>
+        <>
+          <TaskDependenciesPanel
+            tarea={esEdicion ? { id, equipoId } : null}
+            equipoId={equipoId}
+            canEdit={esEdicion}
+            showPlaceholderWhenMissing
+          />
 
-            <Card title="Historial">
-              <div className="historial-list">
-                {historial.map((h) => {
-                  const estadoAnterior = ESTADOS.find(e => e.value === h.estadoAnterior)
-                  const estadoNuevo = ESTADOS.find(e => e.value === h.estadoNuevo)
-                  return (
-                    <div key={h.id} className="historial-item">
-                      <div className="historial-dot" />
-                      <div>
-                        <div className="historial-text">
-                          <strong>@{h.usuario?.nombre || h.usuario?.email || 'Usuario'}</strong>
-                          {' cambió Estado: '}
-                          <span 
-                            className="historial-estado badge"
-                            style={{
-                              backgroundColor: estadoAnterior?.color || '#f3f4f6',
-                              color: estadoAnterior?.textColor || '#374151',
-                              padding: '2px 8px',
-                              borderRadius: '4px',
-                              fontSize: '12px',
-                              fontWeight: 600
-                            }}
-                          >
-                            {h.estadoAnterior || '—'}
-                          </span>
-                          {' → '}
-                          <span 
-                            className="historial-estado badge"
-                            style={{
-                              backgroundColor: estadoNuevo?.color || '#f3f4f6',
-                              color: estadoNuevo?.textColor || '#374151',
-                              padding: '2px 8px',
-                              borderRadius: '4px',
-                              fontSize: '12px',
-                              fontWeight: 600
-                            }}
-                          >
-                            {h.estadoNuevo}
-                          </span>
+          {esEdicion && (
+            <>
+              <Card title="Comentarios">
+                <div className="comentarios-section">
+                  <div className="comentario-input">
+                    <textarea
+                      className="field-input"
+                      value={nuevoComentario}
+                      onChange={(e) => setNuevoComentario(e.target.value)}
+                      placeholder="Escribe un comentario..."
+                      rows={3}
+                    />
+                    <Button type="button" onClick={agregarComentario} disabled={!nuevoComentario.trim()}>
+                      Enviar
+                    </Button>
+                  </div>
+                  <div className="comentarios-list">
+                    {comentarios.map((c) => (
+                      <div key={c.id} className="comentario-item">
+                        <div className="comentario-header">
+                          <strong>@{c.usuario?.nombre || c.autor?.nombre || c.usuario?.email || c.autor?.email || 'Usuario'}</strong>
+                          <span className="comentario-fecha">{formatearFecha(c.createdAt)}</span>
                         </div>
-                        <div className="historial-fecha">{formatearFecha(h.createdAt)}</div>
+                        <div className="comentario-contenido">{c.contenido}</div>
                       </div>
-                    </div>
-                  )
-                })}
-              </div>
-            </Card>
-          </>
-        )}
+                    ))}
+                  </div>
+                </div>
+              </Card>
+
+              <Card title="Historial">
+                <div className="historial-list">
+                  {historial.map((h) => {
+                    const estadoAnterior = ESTADOS.find(e => e.value === h.estadoAnterior)
+                    const estadoNuevo = ESTADOS.find(e => e.value === h.estadoNuevo)
+                    return (
+                      <div key={h.id} className="historial-item">
+                        <div className="historial-dot" />
+                        <div>
+                          <div className="historial-text">
+                            <strong>@{h.usuario?.nombre || h.usuario?.email || 'Usuario'}</strong>
+                            {' cambió Estado: '}
+                            <span 
+                              className="historial-estado badge"
+                              style={{
+                                backgroundColor: estadoAnterior?.color || '#f3f4f6',
+                                color: estadoAnterior?.textColor || '#374151',
+                                padding: '2px 8px',
+                                borderRadius: '4px',
+                                fontSize: '12px',
+                                fontWeight: 600
+                              }}
+                            >
+                              {h.estadoAnterior || '—'}
+                            </span>
+                            {' → '}
+                            <span 
+                              className="historial-estado badge"
+                              style={{
+                                backgroundColor: estadoNuevo?.color || '#f3f4f6',
+                                color: estadoNuevo?.textColor || '#374151',
+                                padding: '2px 8px',
+                                borderRadius: '4px',
+                                fontSize: '12px',
+                                fontWeight: 600
+                              }}
+                            >
+                              {h.estadoNuevo}
+                            </span>
+                          </div>
+                          <div className="historial-fecha">{formatearFecha(h.createdAt)}</div>
+                        </div>
+                      </div>
+                    )
+                  })}
+                </div>
+              </Card>
+            </>
+          )}
+        </>
       </form>
     </div>
   )

@@ -2,6 +2,7 @@ const { Tarea, Usuario, Equipo, Etiqueta, Comentario, HistorialEstado, TareaEtiq
 const { Op } = require('sequelize');
 const QueryBuilder = require('../utils/queryBuilder');
 const ActividadService = require('../services/actividadService');
+const TareaDependencyService = require('../services/tareaDependencyService');
 
 class TareaController {
   static async crear(req, res) {
@@ -121,9 +122,11 @@ class TareaController {
         }
       });
     } catch (error) {
+      console.error('Error al listar tareas:', error);
       res.status(500).json({
         success: false,
-        message: 'Error al listar tareas'
+        message: 'Error al listar tareas',
+        error: process.env.NODE_ENV === 'development' ? error.message : undefined
       });
     }
   }
@@ -200,6 +203,21 @@ class TareaController {
 
       const estadoAnterior = tarea.estado;
       
+      // Validar dependencias si se intenta mover a finalizada
+      if (estado === 'finalizada' && estadoAnterior !== 'finalizada') {
+        const validacion = await TareaDependencyService.validarCierreTarea(tareaId);
+        
+        if (!validacion.puedeCerrar) {
+          return res.status(400).json({
+            success: false,
+            message: 'No se puede finalizar la tarea porque tiene dependencias pendientes',
+            data: {
+              tareasPendientes: validacion.tareasPendientes
+            }
+          });
+        }
+      }
+      
       await tarea.update({
         titulo,
         descripcion,
@@ -208,6 +226,11 @@ class TareaController {
         fechaLimite,
         asignadoA
       });
+      
+      // Sincronizar duplicados si cambió a finalizada o cancelada
+      if (estado && estado !== estadoAnterior && (estado === 'finalizada' || estado === 'cancelada')) {
+        await TareaDependencyService.sincronizarDuplicados(tareaId, estado);
+      }
 
       if (estado && estado !== estadoAnterior) {
         await HistorialEstado.create({

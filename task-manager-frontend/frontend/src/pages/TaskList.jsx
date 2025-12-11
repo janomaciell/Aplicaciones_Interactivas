@@ -6,6 +6,7 @@ import { useAuth } from '../context/AuthContext.jsx'
 import Button from '../components/Button.jsx'
 import Input from '../components/Input.jsx'
 import Card from '../components/Card.jsx'
+import { useTaskDependencies } from '../hooks/useTaskDependencies.js'
 
 const ESTADOS = [
   { value: '', label: 'Todos los estados', icon: '' },
@@ -104,7 +105,24 @@ export default function TaskList() {
 
       const res = await api.get(`/tareas/${equipoId}?${params}`)
       const data = res.data?.data || res.data
-      setTareas(data.rows || data.tareas || [])
+      const tareasData = data.rows || data.tareas || []
+      
+      // Cargar resúmenes de dependencias para cada tarea
+      const tareasConResumen = await Promise.all(
+        tareasData.map(async (tarea) => {
+          try {
+            const resumenRes = await api.get(`/tareas/${equipoId}/${tarea.id}/dependencias/resumen`)
+            return {
+              ...tarea,
+              _dependenciesResumen: resumenRes.data?.data?.resumen || null
+            }
+          } catch {
+            return tarea
+          }
+        })
+      )
+      
+      setTareas(tareasConResumen)
       setTotal(data.count || data.total || 0)
     } catch (e) {
       setError('No pudimos cargar las tareas')
@@ -322,7 +340,7 @@ export default function TaskList() {
       <Card>
         {tareas.length === 0 ? (
           <div className="empty-state">
-            <div className="empty-icon"></div>
+            <div className="empty-icon">📋</div>
             <div className="empty-title">No hay tareas</div>
             <div className="empty-description">
               {equipoId 
@@ -335,6 +353,7 @@ export default function TaskList() {
               <Button 
                 className="btn-success"
                 onClick={() => navigate(`/tareas/nueva?equipo=${equipoId}`)}
+                style={{ marginTop: 16 }}
               >
                 Crear primera tarea
               </Button>
@@ -342,23 +361,27 @@ export default function TaskList() {
           </div>
         ) : (
           <>
-            <div style={{ overflowX: 'auto' }}>
+            <div style={{ overflowX: 'auto', borderRadius: '8px', border: '1px solid var(--border-light)' }}>
               <table className="tasks-table" ref={tableRef}>
                 <thead>
                   <tr>
-                    <th style={{ width: 50 }}>#</th>
-                    <th style={{ minWidth: 250 }}>Título</th>
+                    <th style={{ width: 60 }}>#</th>
+                    <th style={{ minWidth: 280 }}>Título</th>
                     <th style={{ width: 140 }}>Estado</th>
                     <th style={{ width: 130 }}>Prioridad</th>
-                    <th style={{ width: 120 }}>Fecha límite</th>
-                    <th style={{ width: 150 }}>Asignado</th>
+                    <th style={{ width: 130 }}>Fecha límite</th>
+                    <th style={{ width: 180 }}>Asignado</th>
                     <th style={{ width: 100, textAlign: 'right' }}>Acciones</th>
                   </tr>
                 </thead>
                 <tbody>
                   {tareas.map((tarea, idx) => (
                     <tr key={tarea.id}>
-                      <td style={{ color: 'var(--text-muted)', fontWeight: 600 }}>
+                      <td style={{ 
+                        color: 'var(--text-muted)', 
+                        fontWeight: 600,
+                        fontSize: '13px'
+                      }}>
                         {(pagina - 1) * limite + idx + 1}
                       </td>
                       <td>
@@ -366,13 +389,39 @@ export default function TaskList() {
                           className="task-title" 
                           onClick={() => navigate(`/tareas/${tarea.id}`)}
                           style={{ 
-                            display: 'flex', 
-                            alignItems: 'center', 
-                            gap: 8,
-                            fontWeight: 500
+                            fontWeight: 500,
+                            fontSize: '14px'
                           }}
                         >
-                          {tarea.titulo}
+                          <span>{tarea.titulo}</span>
+                          <div style={{ display: 'flex', gap: 6, alignItems: 'center' }}>
+                            {tarea._dependenciesResumen?.bloqueada && (
+                              <span 
+                                title="Esta tarea está bloqueada por dependencias pendientes"
+                                style={{ 
+                                  fontSize: 16,
+                                  color: '#ef4444',
+                                  cursor: 'help',
+                                  lineHeight: 1
+                                }}
+                              >
+                                🔒
+                              </span>
+                            )}
+                            {tarea._dependenciesResumen?.tieneDuplicados && (
+                              <span 
+                                title="Esta tarea tiene duplicados"
+                                style={{ 
+                                  fontSize: 16,
+                                  color: '#3b82f6',
+                                  cursor: 'help',
+                                  lineHeight: 1
+                                }}
+                              >
+                                🔄
+                              </span>
+                            )}
+                          </div>
                         </div>
                       </td>
                       <td>
@@ -385,41 +434,66 @@ export default function TaskList() {
                           {tituloPrioridad(tarea.prioridad || 'media')}
                         </span>
                       </td>
-                      <td style={{ color: 'var(--text-secondary)' }}>
+                      <td style={{ 
+                        color: 'var(--text-secondary)',
+                        fontSize: '13px'
+                      }}>
                         {formatearFecha(tarea.fechaLimite)}
                       </td>
                       <td>
                         {tarea.asignado ? (
-                          <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
-                            <span style={{ 
-                              width: 28, 
-                              height: 28, 
+                          <div style={{ 
+                            display: 'flex', 
+                            alignItems: 'center', 
+                            gap: 8
+                          }}>
+                            <div style={{ 
+                              width: 32, 
+                              height: 32, 
                               borderRadius: '50%', 
-                              background: 'var(--primary)',
+                              background: 'linear-gradient(135deg, var(--primary), var(--primary-hover))',
                               color: 'white',
                               display: 'flex',
                               alignItems: 'center',
                               justifyContent: 'center',
-                              fontSize: 12,
-                              fontWeight: 700
+                              fontSize: 13,
+                              fontWeight: 700,
+                              boxShadow: '0 2px 4px rgba(0,0,0,0.1)'
                             }}>
                               {(tarea.asignado.nombre || tarea.asignado.email || 'U')[0].toUpperCase()}
-                            </span>
-                            <span style={{ fontSize: 14 }}>
+                            </div>
+                            <span style={{ 
+                              fontSize: 14,
+                              color: 'var(--text-primary)',
+                              fontWeight: 500
+                            }}>
                               {tarea.asignado.nombre || tarea.asignado.email}
                             </span>
                           </div>
                         ) : (
-                          <span style={{ color: 'var(--text-muted)' }}>Sin asignar</span>
+                          <span style={{ 
+                            color: 'var(--text-muted)',
+                            fontSize: '13px',
+                            fontStyle: 'italic'
+                          }}>
+                            Sin asignar
+                          </span>
                         )}
                       </td>
                       <td style={{ textAlign: 'right' }}>
                         <Button 
                           variant="ghost" 
-                          onClick={() => navigate(`/tareas/${tarea.id}`)}
-                          style={{ padding: '6px 12px', fontSize: '13px' }}
+                          onClick={(e) => {
+                            e.stopPropagation()
+                            navigate(`/tareas/${tarea.id}`)
+                          }}
+                          style={{ 
+                            padding: '6px 14px', 
+                            fontSize: '13px',
+                            fontWeight: 500
+                          }}
                         >
-                          Ver
+                          Ver detalles
                         </Button>
                       </td>
                     </tr>
@@ -432,23 +506,30 @@ export default function TaskList() {
             {totalPaginas > 1 && (
               <div className="pagination">
                 <div className="pagination-info">
-                  Mostrando {((pagina - 1) * limite) + 1} - {Math.min(pagina * limite, total)} de {total} tareas
+                  Mostrando <strong>{((pagina - 1) * limite) + 1}</strong> - <strong>{Math.min(pagina * limite, total)}</strong> de <strong>{total}</strong> tareas
                 </div>
                 <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
                   <Button 
                     variant="secondary" 
                     onClick={() => setPagina(p => Math.max(1, p - 1))}
                     disabled={pagina === 1}
-                    style={{ padding: '8px 16px' }}
+                    style={{ 
+                      padding: '8px 16px',
+                      fontSize: '14px',
+                      opacity: pagina === 1 ? 0.5 : 1,
+                      cursor: pagina === 1 ? 'not-allowed' : 'pointer'
+                    }}
                   >
                     ◀ Anterior
                   </Button>
                   <div style={{ 
-                    padding: '8px 16px', 
+                    padding: '8px 20px', 
                     background: 'var(--bg-tertiary)', 
                     borderRadius: 8,
                     fontWeight: 600,
-                    fontSize: 14
+                    fontSize: 14,
+                    color: 'var(--text-primary)',
+                    border: '1px solid var(--border)'
                   }}>
                     {pagina} / {totalPaginas}
                   </div>
@@ -456,7 +537,12 @@ export default function TaskList() {
                     variant="secondary" 
                     onClick={() => setPagina(p => Math.min(totalPaginas, p + 1))}
                     disabled={pagina === totalPaginas}
-                    style={{ padding: '8px 16px' }}
+                    style={{ 
+                      padding: '8px 16px',
+                      fontSize: '14px',
+                      opacity: pagina === totalPaginas ? 0.5 : 1,
+                      cursor: pagina === totalPaginas ? 'not-allowed' : 'pointer'
+                    }}
                   >
                     Siguiente ▶
                   </Button>

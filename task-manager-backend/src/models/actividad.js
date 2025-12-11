@@ -9,7 +9,8 @@ module.exports = (sequelize, DataTypes) => {
       type: DataTypes.ENUM(
         'tarea_creada', 'tarea_editada', 'tarea_asignada', 'tarea_estado_cambiado',
         'comentario_agregado', 'etiqueta_agregada', 'etiqueta_removida',
-        'miembro_agregado', 'miembro_removido'
+        'miembro_agregado', 'miembro_removido',
+        'dependencia_creada', 'dependencia_actualizada', 'dependencia_eliminada'
       ),
       allowNull: false
     },

@@ -65,4 +65,6 @@ router.delete('/comentarios/:comentarioId',
   TareaController.eliminarComentario
 );
 
+router.use('/:equipoId/:tareaId/dependencias', require('./dependencias'));
+
 module.exports = router;

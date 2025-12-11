@@ -5,6 +5,7 @@ import { Draggable } from 'gsap/Draggable'
 import api from '../api/client.js'
 import Card from '../components/Card.jsx'
 import Button from '../components/Button.jsx'
+import { useNotifications } from '../context/NotificationContext.jsx'
 
 gsap.registerPlugin(Draggable)
 
@@ -17,6 +18,7 @@ const ESTADOS = [
 
 export default function TaskBoard() {
   const navigate = useNavigate()
+  const { error: showError, warning } = useNotifications()
   const [equipos, setEquipos] = useState([])
   const [equipoId, setEquipoId] = useState('')
   const [tareas, setTareas] = useState([])
@@ -37,7 +39,27 @@ export default function TaskBoard() {
         if (firstId) {
           setEquipoId(firstId)
           const resT = await api.get(`/tareas/${firstId}`)
-          setTareas(resT?.data?.rows || resT?.data?.data?.tareas || [])
+          const tareasData = resT?.data?.rows || resT?.data?.data?.tareas || []
+          
+          // Cargar resúmenes de dependencias para cada tarea
+          const tareasConResumen = await Promise.all(
+            tareasData.map(async (tarea) => {
+              try {
+                const resumenRes = await api.get(`/tareas/${firstId}/${tarea.id}/dependencias/resumen`)
+                return {
+                  ...tarea,
+                  _dependenciesResumen: resumenRes.data?.data?.resumen || null
+                }
+              } catch {
+                return {
+                  ...tarea,
+                  _dependenciesResumen: null
+                }
+              }
+            })
+          )
+          
+          setTareas(tareasConResumen)
         } else {
           setTareas([])
         }
@@ -85,7 +107,27 @@ export default function TaskBoard() {
     setLoading(true)
     try {
       const resT = await api.get(`/tareas/${id}`)
-      setTareas(resT?.data?.rows || resT?.data?.data?.tareas || [])
+      const tareasData = resT?.data?.rows || resT?.data?.data?.tareas || []
+      
+      // Cargar resúmenes de dependencias para cada tarea
+      const tareasConResumen = await Promise.all(
+        tareasData.map(async (tarea) => {
+          try {
+            const resumenRes = await api.get(`/tareas/${id}/${tarea.id}/dependencias/resumen`)
+            return {
+              ...tarea,
+              _dependenciesResumen: resumenRes.data?.data?.resumen || null
+            }
+          } catch {
+            return {
+              ...tarea,
+              _dependenciesResumen: null
+            }
+          }
+        })
+      )
+      
+      setTareas(tareasConResumen)
     } catch (_e) {
       setError('No pudimos cargar las tareas')
     } finally {
@@ -100,6 +142,12 @@ export default function TaskBoard() {
   }, [tareas])
 
   const move = async (tarea, toEstado) => {
+    // Validar si se intenta mover a finalizada y está bloqueada
+    if (toEstado === 'finalizada' && tarea._dependenciesResumen?.bloqueada) {
+      warning('Tarea bloqueada', 'No se puede finalizar esta tarea porque tiene dependencias pendientes. Revisa las dependencias en el detalle de la tarea.')
+      return
+    }
+    
     const prev = tareas
     setTareas((arr) => arr.map((t) => t.id === tarea.id ? { ...t, estado: toEstado } : t))
     try {
@@ -115,6 +163,17 @@ export default function TaskBoard() {
       })
     } catch (e) {
       setTareas(prev)
+      if (e.response?.status === 400) {
+        const message = e.response?.data?.message || 'No se puede cambiar el estado de la tarea'
+        const tareasPendientes = e.response?.data?.data?.tareasPendientes || []
+        if (tareasPendientes.length > 0) {
+          warning('No se puede finalizar', `Las siguientes tareas deben completarse primero: ${tareasPendientes.map(t => t.titulo).join(', ')}`)
+        } else {
+          showError('Error', message)
+        }
+      } else {
+        showError('Error', 'No se pudo actualizar el estado de la tarea')
+      }
     }
   }
 
@@ -210,9 +269,36 @@ export default function TaskBoard() {
                           fontWeight: 600, 
                           fontSize: 15,
                           color: 'var(--text-primary)',
-                          marginBottom: 8
+                          marginBottom: 8,
+                          display: 'flex',
+                          alignItems: 'center',
+                          gap: 6
                         }}>
                           {t.titulo}
+                          {t._dependenciesResumen?.bloqueada && (
+                            <span 
+                              title="Esta tarea está bloqueada por dependencias pendientes"
+                              style={{ 
+                                fontSize: 14,
+                                color: '#ef4444',
+                                cursor: 'help'
+                              }}
+                            >
+                              🔒
+                            </span>
+                          )}
+                          {t._dependenciesResumen?.tieneDuplicados && (
+                            <span 
+                              title="Esta tarea tiene duplicados"
+                              style={{ 
+                                fontSize: 14,
+                                color: '#3b82f6',
+                                cursor: 'help'
+                              }}
+                            >
+                              🔄
+                            </span>
+                          )}
                         </div>
                         {t.descripcion && (
                           <div style={{ 

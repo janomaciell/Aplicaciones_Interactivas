@@ -180,6 +180,44 @@ const validaciones = {
       .optional()
       .isIn(['ASC', 'DESC'])
       .withMessage('Dirección de ordenamiento inválida')
+  ],
+
+  // Validaciones de dependencias
+  crearDependencia: [
+    body('targetTaskId')
+      .isUUID()
+      .withMessage('targetTaskId debe ser un UUID válido'),
+    body('type')
+      .isIn(['DEPENDS_ON', 'BLOCKED_BY', 'DUPLICATED_WITH'])
+      .withMessage('Tipo de dependencia inválido. Debe ser: DEPENDS_ON, BLOCKED_BY o DUPLICATED_WITH'),
+    body('note')
+      .optional()
+      .trim()
+      .isLength({ max: 255 })
+      .withMessage('La nota no puede exceder 255 caracteres')
+  ],
+
+  actualizarDependencia: [
+    body('type')
+      .optional()
+      .isIn(['DEPENDS_ON', 'BLOCKED_BY', 'DUPLICATED_WITH'])
+      .withMessage('Tipo de dependencia inválido. Debe ser: DEPENDS_ON, BLOCKED_BY o DUPLICATED_WITH'),
+    body('note')
+      .optional()
+      .trim()
+      .isLength({ max: 255 })
+      .withMessage('La nota no puede exceder 255 caracteres')
+  ],
+
+  validarQueryDependencias: [
+    query('type')
+      .optional()
+      .isIn(['DEPENDS_ON', 'BLOCKED_BY', 'DUPLICATED_WITH'])
+      .withMessage('Tipo de dependencia inválido'),
+    query('direction')
+      .optional()
+      .isIn(['outgoing', 'incoming', 'both'])
+      .withMessage('Dirección inválida. Debe ser: outgoing, incoming o both')
   ]
 };
 

@@ -72,7 +72,6 @@ module.exports = (sequelize, DataTypes) => {
     timestamps: true,
     hooks: {
       beforeUpdate: (tarea, options) => {
-        // Validar transiciones de estado
         if (tarea.changed('estado')) {
           const estadoAnterior = tarea._previousDataValues.estado;
           const nuevoEstado = tarea.estado;
@@ -89,7 +88,6 @@ module.exports = (sequelize, DataTypes) => {
           }
         }
         
-        // Restricciones de edición para tareas finalizadas/canceladas
         if (['finalizada', 'cancelada'].includes(tarea._previousDataValues.estado)) {
           const camposPermitidos = ['estado'];
           const cambiosRealizados = Object.keys(tarea.changed() || {});
@@ -134,6 +132,16 @@ module.exports = (sequelize, DataTypes) => {
       foreignKey: 'tareaId',
       otherKey: 'etiquetaId',
       as: 'etiquetas'
+    });
+    
+    Tarea.hasMany(models.TareaDependency, {
+      foreignKey: 'sourceTaskId',
+      as: 'dependenciasSalientes'
+    });
+    
+    Tarea.hasMany(models.TareaDependency, {
+      foreignKey: 'targetTaskId',
+      as: 'dependenciasEntrantes'
     });
   };
 

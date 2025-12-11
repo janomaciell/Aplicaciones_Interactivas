@@ -828,37 +828,44 @@ body {
   .badge-pendiente {
     background: var(--status-pendiente-bg);
     color: var(--status-pendiente-text);
+    border: 1px solid var(--status-pendiente);
   }
   
   .badge-en_curso, .badge-en_progreso {
     background: var(--status-en-curso-bg);
     color: var(--status-en-curso-text);
+    border: 1px solid var(--status-en-curso);
   }
   
   .badge-finalizada {
     background: var(--status-finalizada-bg);
     color: var(--status-finalizada-text);
+    border: 1px solid var(--status-finalizada);
   }
   
   .badge-cancelada {
     background: var(--status-cancelada-bg);
     color: var(--status-cancelada-text);
+    border: 1px solid var(--status-cancelada);
   }
   
   /* Prioridades */
   .badge-priority-alta {
     background: var(--priority-alta-bg);
     color: var(--priority-alta-text);
+    border: 1px solid var(--priority-alta);
   }
   
   .badge-priority-media {
     background: var(--priority-media-bg);
     color: var(--priority-media-text);
+    border: 1px solid var(--priority-media);
   }
   
   .badge-priority-baja {
     background: var(--priority-baja-bg);
     color: var(--priority-baja-text);
+    border: 1px solid var(--priority-baja);
   }
   
   /* ===================================
@@ -870,9 +877,10 @@ body {
   }
   
   .empty-icon {
-    font-size: 72px;
-    margin-bottom: 20px;
-    opacity: 0.3;
+    font-size: 64px;
+    margin-bottom: 16px;
+    opacity: 0.4;
+    line-height: 1;
   }
   
   .empty-title {
@@ -880,6 +888,13 @@ body {
     font-weight: 600;
     margin-bottom: 8px;
     color: var(--text-primary);
+  }
+  
+  .empty-description {
+    font-size: 14px;
+    color: var(--text-secondary);
+    margin-bottom: 8px;
+    line-height: 1.6;
   }
   
   .empty-description {
@@ -1114,6 +1129,105 @@ body {
   }
   
   /* ===================================
+     TASKS TABLE
+     =================================== */
+  .tasks-table {
+    width: 100%;
+    border-collapse: separate;
+    border-spacing: 0;
+    font-size: 14px;
+  }
+  
+  .tasks-table thead {
+    background: var(--bg-tertiary);
+    position: sticky;
+    top: 0;
+    z-index: 10;
+  }
+  
+  .tasks-table th {
+    padding: 14px 16px;
+    text-align: left;
+    font-weight: 600;
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    color: var(--text-secondary);
+    border-bottom: 2px solid var(--border);
+    white-space: nowrap;
+  }
+  
+  .tasks-table th:first-child {
+    border-top-left-radius: 8px;
+  }
+  
+  .tasks-table th:last-child {
+    border-top-right-radius: 8px;
+  }
+  
+  .tasks-table tbody tr {
+    border-bottom: 1px solid var(--border-light);
+    transition: all 0.2s ease;
+  }
+  
+  .tasks-table tbody tr:hover {
+    background: var(--bg-tertiary);
+  }
+  
+  .tasks-table tbody tr:last-child {
+    border-bottom: none;
+  }
+  
+  .tasks-table td {
+    padding: 16px;
+    vertical-align: middle;
+    color: var(--text-primary);
+  }
+  
+  .task-title {
+    cursor: pointer;
+    transition: color 0.2s ease;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  
+  .task-title:hover {
+    color: var(--primary);
+  }
+  
+  /* ===================================
+     PAGINATION
+     =================================== */
+  .pagination {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 20px 0;
+    margin-top: 20px;
+    border-top: 1px solid var(--border);
+    flex-wrap: wrap;
+    gap: 16px;
+  }
+  
+  .pagination-info {
+    font-size: 14px;
+    color: var(--text-secondary);
+    font-weight: 500;
+  }
+  
+  @media (max-width: 640px) {
+    .pagination {
+      flex-direction: column;
+      align-items: stretch;
+    }
+    
+    .pagination-info {
+      text-align: center;
+    }
+  }
+  
+  /* ===================================
      PÁGINAS Y DESCRIPCIONES
      =================================== */
   .page-description {
@@ -1206,6 +1320,130 @@ body {
     padding: 48px 24px;
     text-align: center;
     color: var(--text-secondary);
+  }
+  
+  /* ===================================
+     TASK DETAILS PAGE
+     =================================== */
+  .details-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+    gap: 24px;
+    align-items: start;
+  }
+  
+  @media (max-width: 768px) {
+    .details-grid {
+      grid-template-columns: 1fr;
+    }
+  }
+  
+  .task-details-content {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+  }
+  
+  .task-description {
+    padding: 16px;
+    background: var(--bg-tertiary);
+    border-radius: 8px;
+    border-left: 3px solid var(--primary);
+  }
+  
+  .task-description p {
+    margin: 0;
+    color: var(--text-primary);
+    line-height: 1.6;
+    font-size: 15px;
+  }
+  
+  .task-metadata {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 16px;
+    padding: 16px;
+    background: var(--bg-secondary);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+  }
+  
+  .metadata-item {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+  }
+  
+  .metadata-label {
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--text-secondary);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+  
+  .metadata-value {
+    font-size: 14px;
+    color: var(--text-primary);
+    font-weight: 500;
+  }
+  
+  .comentarios-section {
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+  }
+  
+  .comentario-input {
+    margin-bottom: 20px;
+  }
+  
+  .comentarios-list {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+  }
+  
+  .comentario-item {
+    padding: 16px;
+    background: var(--bg-tertiary);
+    border-radius: 8px;
+    border: 1px solid var(--border-light);
+    transition: all 0.2s ease;
+  }
+  
+  .comentario-item:hover {
+    background: var(--bg-secondary);
+    border-color: var(--border);
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+  }
+  
+  .comentario-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 8px;
+    gap: 12px;
+  }
+  
+  .comentario-header strong {
+    color: var(--text-primary);
+    font-size: 14px;
+    font-weight: 600;
+  }
+  
+  .comentario-fecha {
+    font-size: 12px;
+    color: var(--text-muted);
+    white-space: nowrap;
+  }
+  
+  .comentario-contenido {
+    color: var(--text-secondary);
+    font-size: 14px;
+    line-height: 1.6;
+    white-space: pre-wrap;
+    word-wrap: break-word;
   }
   
   /* ===================================
@@ -1443,6 +1681,46 @@ body {
     color: var(--text-secondary);
     font-weight: 500;
   }
+
+/* ===================================
+   MODAL
+   =================================== */
+.modal-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(15, 23, 42, 0.45);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  padding: 16px;
+}
+
+.modal {
+  background: #ffffff;
+  width: min(520px, 100%);
+  max-height: calc(100vh - 48px);
+  overflow: auto;
+  border-radius: 12px;
+  box-shadow: 0 20px 60px rgba(0,0,0,0.18), 0 8px 24px rgba(0,0,0,0.12);
+  padding: 20px;
+}
+
+.modal-title {
+  font-size: 18px;
+  font-weight: 700;
+  margin-bottom: 12px;
+}
+
+.modal-body {
+  margin-bottom: 16px;
+}
+
+.modal-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+}
   
   /* ===================================
      KANBAN BOARD

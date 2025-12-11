@@ -1,4 +1,4 @@
-const { Op } = require('sequelize');
+const { Op, Sequelize } = require('sequelize');
 
 class QueryBuilder {
   static buildTareaFilters(queryParams) {
@@ -42,9 +42,19 @@ class QueryBuilder {
     }
 
     if (busqueda) {
+      // Usar LOWER para búsqueda case-insensitive compatible con MySQL
+      const busquedaLower = busqueda.toLowerCase();
       where[Op.or] = [
-        { titulo: { [Op.iLike]: `%${busqueda}%` } },
-        { descripcion: { [Op.iLike]: `%${busqueda}%` } }
+        Sequelize.where(
+          Sequelize.fn('LOWER', Sequelize.col('titulo')),
+          Op.like,
+          `%${busquedaLower}%`
+        ),
+        Sequelize.where(
+          Sequelize.fn('LOWER', Sequelize.col('descripcion')),
+          Op.like,
+          `%${busquedaLower}%`
+        )
       ];
     }
 
